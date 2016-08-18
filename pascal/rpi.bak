@@ -1,0 +1,80 @@
+UNIT rpi;
+
+INTERFACE
+
+USES unix, sysutils, classes;
+
+
+CONST
+
+  LOW: pchar = '0';
+  HIGH: pchar = '1';
+  OUTPUT: pchar = 'out';
+  INPUT: pchar = 'input';
+
+
+TYPE
+
+  TGPIO = object
+
+   tab_pins: TStringlist;
+   procedure init;
+   destructor destroy;
+   procedure setup(port: integer; mode: pchar);
+   procedure digitalWrite(port: integer; value: pchar);
+  end;
+
+
+
+IMPLEMENTATION
+
+procedure TGPIO.init;
+begin
+  inherited;
+  self.tab_pins:=TStringList.create;
+
+end;
+
+destructor TGPIO.destroy;
+var i:integer;
+    cmd:string;
+begin
+  inherited;
+  for i:= 0 to self.tab_pins.count - 1 do
+    begin
+      cmd := 'echo '+pchar(tab_pins.strings[i])+' > /sys/class/gpio/unexport';
+      writeln(cmd);
+      fpSystem(cmd);
+    end;
+  if assigned(tab_pins) then self.tab_pins.free;
+end;
+
+procedure TGPIO.setup(port: integer; mode: pchar);
+var cmd:string;
+begin
+    cmd:= 'echo '+inttostr(port)+' > /sys/class/gpio/export';
+    writeln(cmd);
+    fpSystem(cmd);
+
+    cmd:= 'sudo chmod -Rv 777 /sys/class/gpio/gpio'+inttostr(port);
+    writeln(cmd);
+    fpSystem(cmd);
+
+    if tab_pins.indexof(inttostr(port)) = -1 then tab_pins.add(inttostr(port));
+    cmd:= 'echo '+mode+' > /sys/class/gpio/gpio'+inttostr(port)+'/direction';
+    writeln(cmd);
+    fpSystem(cmd);
+
+
+end;
+
+
+procedure TGPIO.digitalWrite(port: integer; value: pchar);
+var cmd:string;
+begin
+    cmd:= 'echo '+value+' > /sys/class/gpio/gpio'+inttostr(port)+'/value';
+    writeln(cmd);
+    fpSystem(cmd);
+end;
+
+END.

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<head>
+<title>
+ETAT DES APPAREILS
+</title>
+</head>
+
+<body>
+<H1> Liste des appareils et de leur états</H1>
+{% for pin in pins %}
+<p>La {{pins[pin].name}}
+{% if pins[pin].state == true %}
+ est actuellement allumée. (<a href="/{{pin}}/off">Eteindre</A>)
+{% else %}
+ est actuellement éteinte. (<a href="/{{pin}}/on">Allumer</A>)
+{% endif %}
+</p>
+{% endfor %}
+
+{% if message %}
+<H2> {{message}}</H2>
+{% endif %}
+
+
+
+
+</body>
+
+
+</html>
